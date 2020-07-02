@@ -10,7 +10,10 @@ using Xunit;
 using Xunit.Abstractions;
 using System.Drawing.Printing;
 using System.Linq;
+<<<<<<< HEAD
 using Microsoft.ML.TestFramework.Attributes;
+=======
+>>>>>>> origin/AutoMLTransformers
 
 namespace Microsoft.ML.Tests.Transformers
 {
@@ -43,6 +46,7 @@ namespace Microsoft.ML.Tests.Transformers
             public string grainA;
             public float dataA;
         }
+<<<<<<< HEAD
         
         private class TimeSeriesOneGrainStringInput
         {
@@ -52,6 +56,10 @@ namespace Microsoft.ML.Tests.Transformers
         }
 
         [NotCentOS7Fact]
+=======
+
+        [Fact]
+>>>>>>> origin/AutoMLTransformers
         public void NotImputeOneColumn()
         {
             MLContext mlContext = new MLContext(1);
@@ -63,7 +71,11 @@ namespace Microsoft.ML.Tests.Transformers
             var data = mlContext.Data.LoadFromEnumerable(dataList);
 
             // Build the pipeline, fit, and transform it.
+<<<<<<< HEAD
             var pipeline = mlContext.Transforms.ReplaceMissingTimeSeriesValues("date", new string[] { "grainA" }, new string[] { "dataB"});
+=======
+            var pipeline = mlContext.Transforms.TimeSeriesImputer("date", new string[] { "grainA" }, new string[] { "dataB"});
+>>>>>>> origin/AutoMLTransformers
             var model = pipeline.Fit(data);
             var output = model.Transform(data);
             var schema = output.Schema;
@@ -91,7 +103,11 @@ namespace Microsoft.ML.Tests.Transformers
             Done();
         }
         
+<<<<<<< HEAD
         [NotCentOS7Fact]
+=======
+        [Fact]
+>>>>>>> origin/AutoMLTransformers
         public void ImputeOnlyOneColumn()
         {
             MLContext mlContext = new MLContext(1);
@@ -103,7 +119,11 @@ namespace Microsoft.ML.Tests.Transformers
             var data = mlContext.Data.LoadFromEnumerable(dataList);
 
             // Build the pipeline, fit, and transform it.
+<<<<<<< HEAD
             var pipeline = mlContext.Transforms.ReplaceMissingTimeSeriesValues("date", new string[] { "grainA" }, new string[] { "dataB"}, TimeSeriesImputerEstimator.FilterMode.Include);
+=======
+            var pipeline = mlContext.Transforms.TimeSeriesImputer("date", new string[] { "grainA" }, new string[] { "dataB"}, TimeSeriesImputerEstimator.FilterMode.Include);
+>>>>>>> origin/AutoMLTransformers
             var model = pipeline.Fit(data);
             var output = model.Transform(data);
             var schema = output.Schema;
@@ -135,7 +155,11 @@ namespace Microsoft.ML.Tests.Transformers
             Done();
         }
 
+<<<<<<< HEAD
         [NotCentOS7Fact]
+=======
+        [Fact]
+>>>>>>> origin/AutoMLTransformers
         public void Forwardfill()
         {
             MLContext mlContext = new MLContext(1);
@@ -147,7 +171,11 @@ namespace Microsoft.ML.Tests.Transformers
             var data = mlContext.Data.LoadFromEnumerable(dataList);
 
             // Build the pipeline, fit, and transform it.
+<<<<<<< HEAD
             var pipeline = mlContext.Transforms.ReplaceMissingTimeSeriesValues("date", new string[] { "grainA" });
+=======
+            var pipeline = mlContext.Transforms.TimeSeriesImputer("date", new string[] { "grainA" });
+>>>>>>> origin/AutoMLTransformers
             var model = pipeline.Fit(data);
             var output = model.Transform(data);
             var prev = output.Preview();
@@ -190,6 +218,7 @@ namespace Microsoft.ML.Tests.Transformers
             Done();
         }
         
+<<<<<<< HEAD
         [NotCentOS7Fact]
         public void DateTimeSupportForwardfill()
         {
@@ -246,6 +275,9 @@ namespace Microsoft.ML.Tests.Transformers
         }
         
         [NotCentOS7Fact]
+=======
+        [Fact]
+>>>>>>> origin/AutoMLTransformers
         public void EntryPoint()
         {
             MLContext mlContext = new MLContext(1);
@@ -298,7 +330,11 @@ namespace Microsoft.ML.Tests.Transformers
             Done();
         }
 
+<<<<<<< HEAD
         [NotCentOS7Fact]
+=======
+        [Fact]
+>>>>>>> origin/AutoMLTransformers
         public void Median()
         {
             MLContext mlContext = new MLContext(1);
@@ -310,7 +346,11 @@ namespace Microsoft.ML.Tests.Transformers
             var data = mlContext.Data.LoadFromEnumerable(dataList);
 
             // Build the pipeline, fit, and transform it.
+<<<<<<< HEAD
             var pipeline = mlContext.Transforms.ReplaceMissingTimeSeriesValues("date", new string[] { "grainA" }, imputeMode: TimeSeriesImputerEstimator.ImputationStrategy.Median, filterColumns: null, suppressTypeErrors: true);
+=======
+            var pipeline = mlContext.Transforms.TimeSeriesImputer("date", new string[] { "grainA" }, imputeMode: TimeSeriesImputerEstimator.ImputationStrategy.Median, filterColumns: null, suppressTypeErrors: true);
+>>>>>>> origin/AutoMLTransformers
             var model = pipeline.Fit(data);
 
             var output = model.Transform(data);
@@ -354,6 +394,7 @@ namespace Microsoft.ML.Tests.Transformers
             TestEstimatorCore(pipeline, data);
             Done();
         }
+<<<<<<< HEAD
 
         [NotCentOS7Fact]
         public void DateTimeTypeSupportMedian()
@@ -399,6 +440,10 @@ namespace Microsoft.ML.Tests.Transformers
         }
 
         [NotCentOS7Fact]
+=======
+        
+        [Fact]
+>>>>>>> origin/AutoMLTransformers
         public void Backfill()
         {
             MLContext mlContext = new MLContext(1);
@@ -410,7 +455,11 @@ namespace Microsoft.ML.Tests.Transformers
             var data = mlContext.Data.LoadFromEnumerable(dataList);
 
             // Build the pipeline, fit, and transform it.
+<<<<<<< HEAD
             var pipeline = mlContext.Transforms.ReplaceMissingTimeSeriesValues("date", new string[] { "grainA" }, TimeSeriesImputerEstimator.ImputationStrategy.BackFill);
+=======
+            var pipeline = mlContext.Transforms.TimeSeriesImputer("date", new string[] { "grainA" }, TimeSeriesImputerEstimator.ImputationStrategy.BackFill);
+>>>>>>> origin/AutoMLTransformers
             var model = pipeline.Fit(data);
             var output = model.Transform(data);
             var prev = output.Preview();
@@ -453,7 +502,11 @@ namespace Microsoft.ML.Tests.Transformers
             Done();
         }
 
+<<<<<<< HEAD
         [NotCentOS7Fact]
+=======
+        [Fact]
+>>>>>>> origin/AutoMLTransformers
         public void BackfillTwoGrain()
         {
             MLContext mlContext = new MLContext(1);
@@ -465,7 +518,11 @@ namespace Microsoft.ML.Tests.Transformers
             var data = mlContext.Data.LoadFromEnumerable(dataList);
 
             // Build the pipeline, fit, and transform it.
+<<<<<<< HEAD
             var pipeline = mlContext.Transforms.ReplaceMissingTimeSeriesValues("date", new string[] { "grainA", "grainB" }, TimeSeriesImputerEstimator.ImputationStrategy.BackFill);
+=======
+            var pipeline = mlContext.Transforms.TimeSeriesImputer("date", new string[] { "grainA", "grainB" }, TimeSeriesImputerEstimator.ImputationStrategy.BackFill);
+>>>>>>> origin/AutoMLTransformers
             var model = pipeline.Fit(data);
             var output = model.Transform(data);
             var prev = output.Preview();
@@ -504,6 +561,7 @@ namespace Microsoft.ML.Tests.Transformers
             TestEstimatorCore(pipeline, data);
             Done();
         }
+<<<<<<< HEAD
 
         [NotCentOS7Fact]
         public void InvalidTypeForImputationStrategy()
@@ -565,5 +623,7 @@ namespace Microsoft.ML.Tests.Transformers
 
             Done();
         }
+=======
+>>>>>>> origin/AutoMLTransformers
     }
 }

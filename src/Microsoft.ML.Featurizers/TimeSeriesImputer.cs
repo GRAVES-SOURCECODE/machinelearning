@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+<<<<<<< HEAD
 using System.Diagnostics;
 using System.IO;
+=======
+>>>>>>> origin/AutoMLTransformers
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -29,6 +32,7 @@ namespace Microsoft.ML.Featurizers
     public static class TimeSeriesImputerExtensionClass
     {
         /// <summary>
+<<<<<<< HEAD
         /// Create a <see cref="TimeSeriesImputerEstimator"/>, Imputes missing rows and column data per grain. Operates on all columns in the IDataView.
         /// Currently only float/double/string columns are supported for imputation strategies, and an empty string is considered "missing" for the
         /// purpose of this estimator. Other column types will have the default value placed if a row is imputed.
@@ -49,11 +53,29 @@ namespace Microsoft.ML.Featurizers
         /// </summary>
         /// <param name="catalog">The transform catalog.</param>
         /// <param name="timeSeriesColumn">Column representing the time series. Should be of type <see cref="long"/> or <see cref="System.DateTime"/></param>
+=======
+        /// Create a <see cref="TimeSeriesImputerEstimator"/>, Imputes missing rows and column data per grain. Operates on all columns in the IDataView. Currently only numeric columns are supported.
+        /// </summary>
+        /// <param name="catalog">The transform catalog.</param>
+        /// <param name="timeSeriesColumn">Column representing the time series. Should be of type <see cref="long"/></param>
+        /// <param name="grainColumns">List of columns to use as grains</param>
+        /// <param name="imputeMode">Mode of imputation for missing values in column. If not passed defaults to forward fill</param>
+        public static TimeSeriesImputerEstimator TimeSeriesImputer(this TransformsCatalog catalog, string timeSeriesColumn, string[] grainColumns, TimeSeriesImputerEstimator.ImputationStrategy imputeMode = TimeSeriesImputerEstimator.ImputationStrategy.ForwardFill) =>
+            new TimeSeriesImputerEstimator(CatalogUtils.GetEnvironment(catalog), timeSeriesColumn, grainColumns, null, TimeSeriesImputerEstimator.FilterMode.NoFilter, imputeMode, false);
+
+        /// <summary>
+        /// Create a <see cref="TimeSeriesImputerEstimator"/>, Imputes missing rows and column data per grain. Operates on a filtered list of columns in the IDataView.
+        /// If a column is not imputed but rows are added then it will be filled with the default value for that data type. Currently only numeric columns are supported for imputation.
+        /// </summary>
+        /// <param name="catalog">The transform catalog.</param>
+        /// <param name="timeSeriesColumn">Column representing the time series. Should be of type <see cref="long"/></param>
+>>>>>>> origin/AutoMLTransformers
         /// <param name="grainColumns">List of columns to use as grains</param>
         /// <param name="filterColumns">List of columns to filter. If <paramref name="filterMode"/> is <see cref="TimeSeriesImputerEstimator.FilterMode.Exclude"/> than columns in the list will be ignored.
         /// If <paramref name="filterMode"/> is <see cref="TimeSeriesImputerEstimator.FilterMode.Include"/> than values in the list are the only columns imputed.</param>
         /// <param name="filterMode">Whether the list <paramref name="filterColumns"/> should include or exclude those columns.</param>
         /// <param name="imputeMode">Mode of imputation for missing values in column. If not passed defaults to forward fill</param>
+<<<<<<< HEAD
         /// <param name="suppressTypeErrors">Suppress the errors that would occur if a column and impute mode are incompatible. If true, will skip the column and use the default value. If false, will stop and throw an error.</param>
         public static TimeSeriesImputerEstimator ReplaceMissingTimeSeriesValues(this TransformsCatalog catalog, string timeSeriesColumn,
             string[] grainColumns, string[] filterColumns, TimeSeriesImputerEstimator.FilterMode filterMode = TimeSeriesImputerEstimator.FilterMode.Exclude,
@@ -65,6 +87,18 @@ namespace Microsoft.ML.Featurizers
     /// <summary>
     /// Imputes missing rows and column data per grain, based on the dates in the date column.
     ///
+=======
+        /// <param name="suppressTypeErrors">Supress the errors that would occur if a column and impute mode are imcompatible. If true, will skip the column. If false, will stop and throw an error.</param>
+        public static TimeSeriesImputerEstimator TimeSeriesImputer(this TransformsCatalog catalog, string timeSeriesColumn, string[] grainColumns, string[] filterColumns, TimeSeriesImputerEstimator.FilterMode filterMode = TimeSeriesImputerEstimator.FilterMode.Exclude, TimeSeriesImputerEstimator.ImputationStrategy imputeMode = TimeSeriesImputerEstimator.ImputationStrategy.ForwardFill, bool suppressTypeErrors = false) =>
+            new TimeSeriesImputerEstimator(CatalogUtils.GetEnvironment(catalog), timeSeriesColumn, grainColumns, filterColumns, filterMode, imputeMode, suppressTypeErrors);
+    }
+
+    /// <summary>
+    /// Imputes missing rows and column data per grain, based on the dates in the date column. Operates on a filtered list of columns in the IDataView.
+    /// If a column is not imputed but rows are added then it will be filled with the default value for that data type. Currently only numeric columns are supported for imputation.
+    /// A new column is added to the schema after this operation is run. The column is called "IsRowImputed" and is a boolean value representing if the row was created as a result
+    /// of this transformer or not.
+>>>>>>> origin/AutoMLTransformers
     /// </summary>
     /// <remarks>
     /// <format type="text/markdown"><![CDATA[
@@ -75,6 +109,7 @@ namespace Microsoft.ML.Featurizers
     /// | Does this estimator need to look at the data to train its parameters? | Yes |
     /// | Input column data type | All Types |
     /// | Output column data type | All Types |
+<<<<<<< HEAD
     /// | Exportable to ONNX | No |
     ///
     /// The TimeSeriesImputer imputes missing rows and column data per grain (category), based on the dates in the date column. This operation needs to happen to every column in the IDataView,
@@ -89,12 +124,22 @@ namespace Microsoft.ML.Featurizers
     /// NOTE: It is not recommended to chain this multiple times. If a column is filtered, the default value is placed when a row is imputed, and the
     /// default value is not null. Thus any other TimeSeriesImputers will not be able to replace those values anymore causing essentially a very
     /// computationally expensive NO-OP.
+=======
+    ///
+    /// The <xref:Microsoft.ML.Transforms.TimeSeriesImputerEstimator> is not a trivial estimator and needs training.
+    ///
+>>>>>>> origin/AutoMLTransformers
     ///
     /// ]]>
     /// </format>
     /// </remarks>
+<<<<<<< HEAD
     /// <seealso cref="TimeSeriesImputerExtensionClass.ReplaceMissingTimeSeriesValues(TransformsCatalog, string, string[], ImputationStrategy)"/>
     /// <seealso cref="TimeSeriesImputerExtensionClass.ReplaceMissingTimeSeriesValues(TransformsCatalog, string, string[], string[], FilterMode, ImputationStrategy, bool)"/>
+=======
+    /// <seealso cref="TimeSeriesImputerExtensionClass.TimeSeriesImputer(TransformsCatalog, string, string[], ImputationStrategy)"/>
+    /// <seealso cref="TimeSeriesImputerExtensionClass.TimeSeriesImputer(TransformsCatalog, string, string[], string[], FilterMode, ImputationStrategy, bool)"/>
+>>>>>>> origin/AutoMLTransformers
     public sealed class TimeSeriesImputerEstimator : IEstimator<TimeSeriesImputerTransformer>
     {
         private Options _options;
@@ -102,7 +147,11 @@ namespace Microsoft.ML.Featurizers
 
         private readonly IHost _host;
         private static readonly List<Type> _currentSupportedTypes = new List<Type> { typeof(sbyte), typeof(byte), typeof(short), typeof(ushort), typeof(int), typeof(uint),
+<<<<<<< HEAD
             typeof(long), typeof(ulong), typeof(float), typeof(double), typeof(string), typeof(ReadOnlyMemory<char>), typeof(DateTime)};
+=======
+            typeof(long), typeof(ulong), typeof(float), typeof(double), typeof(string), typeof(ReadOnlyMemory<char>)};
+>>>>>>> origin/AutoMLTransformers
 
         #region Options
         internal sealed class Options : TransformInputBase
@@ -123,7 +172,11 @@ namespace Microsoft.ML.Featurizers
             [Argument(ArgumentType.AtMostOnce, HelpText = "Mode for imputing, defaults to ForwardFill if not provided", Name = "ImputeMode", ShortName = "mode", SortOrder = 3)]
             public ImputationStrategy ImputeMode = ImputationStrategy.ForwardFill;
 
+<<<<<<< HEAD
             [Argument(ArgumentType.AtMostOnce, HelpText = "Suppress the errors that would occur if a column and impute mode are incompatible. If true, will skip the column. If false, will stop and throw an error.", Name = "SupressTypeErrors", ShortName = "error", SortOrder = 3)]
+=======
+            [Argument(ArgumentType.AtMostOnce, HelpText = "Supress the errors that would occur if a column and impute mode are imcompatible. If true, will skip the column. If false, will stop and throw an error.", Name = "SupressTypeErrors", ShortName = "error", SortOrder = 3)]
+>>>>>>> origin/AutoMLTransformers
             public bool SupressTypeErrors = false;
         }
 
@@ -131,6 +184,7 @@ namespace Microsoft.ML.Featurizers
 
         #region Class Enums
 
+<<<<<<< HEAD
         /// <summary>
         /// This is the representation of which Imputation Strategy to use.
         /// ForwardFill takes the value from the last good row and propagates it forward anytime a row is imputed or a missing value is found.
@@ -178,6 +232,16 @@ namespace Microsoft.ML.Featurizers
             /// Does the ImputationStrategy on all columns but the ones you specify, which will get the default value.
             /// </summary>
             Exclude = 3
+=======
+        public enum ImputationStrategy : byte
+        {
+            ForwardFill = 1, BackFill, Median, Interpolate
+        };
+
+        public enum FilterMode : byte
+        {
+            NoFilter = 1, Include, Exclude
+>>>>>>> origin/AutoMLTransformers
         };
 
         #endregion
@@ -185,7 +249,10 @@ namespace Microsoft.ML.Featurizers
         internal TimeSeriesImputerEstimator(IHostEnvironment env, string timeSeriesColumn, string[] grainColumns, string[] filterColumns, FilterMode filterMode, ImputationStrategy imputeMode, bool supressTypeErrors)
         {
             Contracts.CheckValue(env, nameof(env));
+<<<<<<< HEAD
             _host.Check(!CommonExtensions.OsIsCentOS7(), "CentOS7 is not supported");
+=======
+>>>>>>> origin/AutoMLTransformers
             _host = Contracts.CheckRef(env, nameof(env)).Register("TimeSeriesImputerEstimator");
             _host.CheckValue(timeSeriesColumn, nameof(timeSeriesColumn), "TimePoint column should not be null.");
             _host.CheckNonEmpty(grainColumns, nameof(grainColumns), "Need at least one grain column.");
@@ -206,7 +273,10 @@ namespace Microsoft.ML.Featurizers
         internal TimeSeriesImputerEstimator(IHostEnvironment env, Options options)
         {
             Contracts.CheckValue(env, nameof(env));
+<<<<<<< HEAD
             _host.Check(!CommonExtensions.OsIsCentOS7(), "CentOS7 is not supported");
+=======
+>>>>>>> origin/AutoMLTransformers
             _host = Contracts.CheckRef(env, nameof(env)).Register("TimeSeriesImputerEstimator");
             _host.CheckValue(options.TimeSeriesColumn, nameof(options.TimeSeriesColumn), "TimePoint column should not be null.");
             _host.CheckValue(options.GrainColumns, nameof(options.GrainColumns), "Grain columns should not be null.");
@@ -235,7 +305,11 @@ namespace Microsoft.ML.Featurizers
                 }
             }
 
+<<<<<<< HEAD
             return new TimeSeriesImputerTransformer(_host, _options, input);
+=======
+            return new TimeSeriesImputerTransformer(_host, _options.TimeSeriesColumn, _options.GrainColumns, _options.FilterColumns, _options.FilterMode, _options.ImputeMode, _options.SupressTypeErrors, input);
+>>>>>>> origin/AutoMLTransformers
         }
 
         // Add one column called WasColumnImputed, otherwise everything stays the same.
@@ -253,7 +327,11 @@ namespace Microsoft.ML.Featurizers
 
         internal const string Summary = "Fills in missing row and values";
         internal const string UserName = "TimeSeriesImputer";
+<<<<<<< HEAD
         internal const string ShortName = "tsi";
+=======
+        internal const string ShortName = "TimeSeriesImputer";
+>>>>>>> origin/AutoMLTransformers
         internal const string LoadName = "TimeSeriesImputer";
         internal const string LoaderSignature = "TimeSeriesImputer";
 
@@ -269,6 +347,7 @@ namespace Microsoft.ML.Featurizers
         #endregion
 
         // Normal constructor.
+<<<<<<< HEAD
         internal TimeSeriesImputerTransformer(IHostEnvironment host, TimeSeriesImputerEstimator.Options options, IDataView input)
         {
             _host = host.Register(nameof(TimeSeriesImputerTransformer));
@@ -283,11 +362,31 @@ namespace Microsoft.ML.Featurizers
                 tempDataColumns = input.Schema.Where(x => !options.FilterColumns.Contains(x.Name)).Select(x => x.Name);
             else if (options.FilterMode == TimeSeriesImputerEstimator.FilterMode.Include)
                 tempDataColumns = input.Schema.Where(x => options.FilterColumns.Contains(x.Name)).Select(x => x.Name);
+=======
+        internal TimeSeriesImputerTransformer(IHostEnvironment host, string timeSeriesColumn, string[] grainColumns, string[] filterColumns, TimeSeriesImputerEstimator.FilterMode filterMode, TimeSeriesImputerEstimator.ImputationStrategy imputeMode, bool suppressTypeErrors, IDataView input)
+        {
+            _host = host.Register(nameof(TimeSeriesImputerTransformer));
+            _timeSeriesColumn = timeSeriesColumn;
+            _grainColumns = grainColumns;
+            _imputeMode = imputeMode;
+            _suppressTypeErrors = suppressTypeErrors;
+
+            IEnumerable<string> tempDataColumns;
+
+            if (filterMode == TimeSeriesImputerEstimator.FilterMode.Exclude)
+                tempDataColumns = input.Schema.Where(x => !filterColumns.Contains(x.Name)).Select(x => x.Name);
+            else if (filterMode == TimeSeriesImputerEstimator.FilterMode.Include)
+                tempDataColumns = input.Schema.Where(x => filterColumns.Contains(x.Name)).Select(x => x.Name);
+>>>>>>> origin/AutoMLTransformers
             else
                 tempDataColumns = input.Schema.Select(x => x.Name);
 
             // Time series and Grain columns should never be included in the data columns
+<<<<<<< HEAD
             _dataColumns = tempDataColumns.Where(x => x != _timeSeriesColumn && !_grainColumns.Contains(x)).ToArray();
+=======
+            _dataColumns = tempDataColumns.Where(x => x != timeSeriesColumn && !grainColumns.Contains(x)).ToArray();
+>>>>>>> origin/AutoMLTransformers
 
             // 1 is for the time series column. Make one array in the correct order of all the columns.
             // Order is Timeseries column, All grain columns, All data columns.
@@ -303,7 +402,10 @@ namespace Microsoft.ML.Featurizers
         internal TimeSeriesImputerTransformer(IHostEnvironment host, ModelLoadContext ctx)
         {
             _host = host.Register(nameof(TimeSeriesImputerTransformer));
+<<<<<<< HEAD
             _host.Check(!CommonExtensions.OsIsCentOS7(), "CentOS7 is not supported");
+=======
+>>>>>>> origin/AutoMLTransformers
 
             // *** Binary format ***
             // name of time series column
@@ -333,6 +435,7 @@ namespace Microsoft.ML.Featurizers
             Array.Copy(_grainColumns, 0, _allColumnNames, 1, _grainColumns.Length);
             Array.Copy(_dataColumns, 0, _allColumnNames, 1 + _grainColumns.Length, _dataColumns.Length);
 
+<<<<<<< HEAD
             var nativeState = ctx.Reader.ReadByteArray();
             TransformerHandle = CreateTransformerFromSavedData(nativeState);
         }
@@ -343,6 +446,18 @@ namespace Microsoft.ML.Featurizers
             {
                 IntPtr dataSize = new IntPtr(nativeState.Count());
                 var result = CreateTransformerFromSavedDataNative(rawStatePointer, dataSize, out IntPtr transformer, out IntPtr errorHandle);
+=======
+            var nativeData = ctx.Reader.ReadByteArray();
+            TransformerHandle = CreateTransformerFromSavedData(nativeData);
+        }
+
+        private unsafe TransformerEstimatorSafeHandle CreateTransformerFromSavedData(byte[] data)
+        {
+            fixed (byte* rawData = data)
+            {
+                IntPtr dataSize = new IntPtr(data.Count());
+                var result = CreateTransformerFromSavedDataNative(rawData, dataSize, out IntPtr transformer, out IntPtr errorHandle);
+>>>>>>> origin/AutoMLTransformers
                 if (!result)
                     throw new Exception(GetErrorDetailsAndFreeNativeMemory(errorHandle));
 
@@ -364,6 +479,12 @@ namespace Microsoft.ML.Featurizers
 
             var allColumns = input.Schema.Where(x => _allColumnNames.Contains(x.Name)).Select(x => TypedColumn.CreateTypedColumn(x, _dataColumns)).ToDictionary(x => x.Column.Name);
 
+<<<<<<< HEAD
+=======
+            // Create buffer to hold binary data
+            var columnBuffer = new byte[1024];
+
+>>>>>>> origin/AutoMLTransformers
             // Create TypeId[] for types of grain and data columns;
             var dataColumnTypes = new TypeId[_dataColumns.Length];
             var grainColumnTypes = new TypeId[_grainColumns.Length];
@@ -383,6 +504,7 @@ namespace Microsoft.ML.Featurizers
             if (!success)
                 throw new Exception(GetErrorDetailsAndFreeNativeMemory(errorHandle));
 
+<<<<<<< HEAD
             using (var estimatorHandle = new TransformerEstimatorSafeHandle(estimator, DestroyEstimatorNative))
             {
                 TrainingState trainingState;
@@ -461,10 +583,47 @@ namespace Microsoft.ML.Featurizers
                 // Manually dispose of the IEnumerator since we dont have a using statement;
                 cursor.Dispose();
 
+=======
+            using (var estimatorHandler = new TransformerEstimatorSafeHandle(estimator, DestroyEstimatorNative))
+            {
+                var fitResult = FitResult.Continue;
+                while (fitResult != FitResult.Complete)
+                {
+                    using (var cursor = input.GetRowCursorForAllColumns())
+                    {
+                        // Initialize getters for start of loop
+                        foreach (var column in allColumns.Values)
+                            column.InitializeGetter(cursor);
+
+                        while ((fitResult == FitResult.Continue || fitResult == FitResult.ResetAndContinue) && cursor.MoveNext())
+                        {
+                            BuildColumnByteArray(allColumns, ref columnBuffer, out int bufferLength);
+
+                            fixed (byte* bufferPointer = columnBuffer)
+                            {
+                                var binaryArchiveData = new NativeBinaryArchiveData() { Data = bufferPointer, DataSize = new IntPtr(bufferLength) };
+                                success = FitNative(estimatorHandler, binaryArchiveData, out fitResult, out errorHandle);
+                            }
+                            if (!success)
+                                throw new Exception(GetErrorDetailsAndFreeNativeMemory(errorHandle));
+                        }
+
+                        success = CompleteTrainingNative(estimatorHandler, out fitResult, out errorHandle);
+                        if (!success)
+                            throw new Exception(GetErrorDetailsAndFreeNativeMemory(errorHandle));
+                    }
+                }
+
+                success = CreateTransformerFromEstimatorNative(estimatorHandler, out IntPtr transformer, out errorHandle);
+                if (!success)
+                    throw new Exception(GetErrorDetailsAndFreeNativeMemory(errorHandle));
+
+>>>>>>> origin/AutoMLTransformers
                 return new TransformerEstimatorSafeHandle(transformer, DestroyTransformerNative);
             }
         }
 
+<<<<<<< HEAD
         private void ResetCursor(IDataView input, ref DataViewRowCursor cursor, Dictionary<string, TypedColumn> allColumns)
         {
             cursor.Dispose();
@@ -484,6 +643,20 @@ namespace Microsoft.ML.Featurizers
             foreach (var column in _allColumnNames)
             {
                 allColumns[column].SerializeValue(ref binaryWriter);
+=======
+        private void BuildColumnByteArray(Dictionary<string, TypedColumn> allColumns, ref byte[] columnByteBuffer, out int bufferLength)
+        {
+            bufferLength = 0;
+            foreach (var column in _allColumnNames)
+            {
+                var bytes = allColumns[column].GetSerializedValue();
+                var byteLength = bytes.Length;
+                if (byteLength + bufferLength >= columnByteBuffer.Length)
+                    Array.Resize(ref columnByteBuffer, columnByteBuffer.Length * 2);
+
+                Array.Copy(bytes, 0, columnByteBuffer, bufferLength, byteLength);
+                bufferLength += byteLength;
+>>>>>>> origin/AutoMLTransformers
             }
         }
 
@@ -586,7 +759,11 @@ namespace Microsoft.ML.Featurizers
         private static extern bool DestroyTransformerNative(IntPtr transformer, out IntPtr errorHandle);
 
         [DllImport("Featurizers", EntryPoint = "TimeSeriesImputerFeaturizer_BinaryArchive_CompleteTraining", CallingConvention = CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+<<<<<<< HEAD
         private static extern bool CompleteTrainingNative(TransformerEstimatorSafeHandle estimator, out IntPtr errorHandle);
+=======
+        private static extern bool CompleteTrainingNative(TransformerEstimatorSafeHandle estimator, out FitResult fitResult, out IntPtr errorHandle);
+>>>>>>> origin/AutoMLTransformers
 
         [DllImport("Featurizers", EntryPoint = "TimeSeriesImputerFeaturizer_BinaryArchive_Fit", CallingConvention = CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
         private static unsafe extern bool FitNative(TransformerEstimatorSafeHandle estimator, NativeBinaryArchiveData data, out FitResult fitResult, out IntPtr errorHandle);
@@ -597,6 +774,7 @@ namespace Microsoft.ML.Featurizers
         [DllImport("Featurizers", EntryPoint = "TimeSeriesImputerFeaturizer_BinaryArchive_CreateTransformerSaveData", CallingConvention = CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
         private static extern bool CreateTransformerSaveDataNative(TransformerEstimatorSafeHandle transformer, out IntPtr buffer, out IntPtr bufferSize, out IntPtr error);
 
+<<<<<<< HEAD
         [DllImport("Featurizers", EntryPoint = "TimeSeriesImputerFeaturizer_BinaryArchive_CreateONNXSaveData", CallingConvention = CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
         private static extern bool CreateOnnxSaveDataNative(TransformerEstimatorSafeHandle transformer, out IntPtr buffer, out IntPtr bufferSize, out IntPtr error);
 
@@ -609,6 +787,11 @@ namespace Microsoft.ML.Featurizers
         [DllImport("Featurizers", EntryPoint = "TimeSeriesImputerFeaturizer_BinaryArchive_GetState"), SuppressUnmanagedCodeSecurity]
         private static unsafe extern bool GetStateNative(TransformerEstimatorSafeHandle estimator, out TrainingState trainingState, out IntPtr errorHandle);
 
+=======
+        [DllImport("Featurizers", EntryPoint = "TimeSeriesImputerFeaturizer_BinaryArchive_CreateTransformerFromSavedData"), SuppressUnmanagedCodeSecurity]
+        private static unsafe extern bool CreateTransformerFromSavedDataNative(byte* rawData, IntPtr bufferSize, out IntPtr transformer, out IntPtr errorHandle);
+
+>>>>>>> origin/AutoMLTransformers
         #endregion
 
         #region Typed Columns
@@ -622,7 +805,11 @@ namespace Microsoft.ML.Featurizers
             }
 
             internal abstract void InitializeGetter(DataViewRowCursor cursor);
+<<<<<<< HEAD
             internal abstract void SerializeValue(ref BinaryWriter binaryWriter);
+=======
+            internal abstract byte[] GetSerializedValue();
+>>>>>>> origin/AutoMLTransformers
             internal abstract TypeId GetTypeId();
 
             internal static TypedColumn CreateTypedColumn(DataViewSchema.Column column, string[] optionalColumns)
@@ -650,8 +837,11 @@ namespace Microsoft.ML.Featurizers
                     return new NumericTypedColumn<double>(column, optionalColumns.Contains(column.Name));
                 else if (type == typeof(ReadOnlyMemory<char>).ToString())
                     return new StringTypedColumn(column, optionalColumns.Contains(column.Name));
+<<<<<<< HEAD
                 else if (type == typeof(DateTime).ToString())
                     return new DateTimeTypedColumn(column, optionalColumns.Contains(column.Name));
+=======
+>>>>>>> origin/AutoMLTransformers
 
                 throw new InvalidOperationException($"Unsupported type {type}");
             }
@@ -695,6 +885,7 @@ namespace Microsoft.ML.Featurizers
                 _isNullable = isNullable;
             }
 
+<<<<<<< HEAD
             internal override void SerializeValue(ref BinaryWriter binaryWriter)
             {
                 dynamic value = GetValue();
@@ -703,6 +894,24 @@ namespace Microsoft.ML.Featurizers
                     binaryWriter.Write(true);
 
                 binaryWriter.Write(value);
+=======
+            internal override byte[] GetSerializedValue()
+            {
+                dynamic value = GetValue();
+                byte[] bytes;
+                if (value.GetType() == typeof(byte))
+                    bytes = new byte[1] { value };
+                if (BitConverter.IsLittleEndian)
+                    bytes = BitConverter.GetBytes(value);
+                // Will need to enable this when Jin's pr goes in. return ((IEnumerable<byte>)BitConverter.GetBytes(value)).Reverse().ToArray();
+                else
+                    bytes = BitConverter.GetBytes(value);
+
+                if (_isNullable && value.GetType() != typeof(float) && value.GetType() != typeof(double))
+                    return new byte[1] { Convert.ToByte(true) }.Concat(bytes).ToArray();
+                else
+                    return bytes;
+>>>>>>> origin/AutoMLTransformers
             }
         }
 
@@ -716,6 +925,7 @@ namespace Microsoft.ML.Featurizers
                 _isNullable = isNullable;
             }
 
+<<<<<<< HEAD
             internal override void SerializeValue(ref BinaryWriter binaryWriter)
             {
                 var value = GetValue().ToString();
@@ -751,6 +961,15 @@ namespace Microsoft.ML.Featurizers
                     binaryWriter.Write(true);
 
                 binaryWriter.Write(value);
+=======
+            internal override byte[] GetSerializedValue()
+            {
+                var value = GetValue().ToString();
+                var stringBytes = Encoding.UTF8.GetBytes(value);
+                if (_isNullable)
+                    return new byte[] { Convert.ToByte(true) }.Concat(BitConverter.GetBytes(stringBytes.Length)).Concat(stringBytes).ToArray();
+                return BitConverter.GetBytes(stringBytes.Length).Concat(stringBytes).ToArray();
+>>>>>>> origin/AutoMLTransformers
             }
         }
 

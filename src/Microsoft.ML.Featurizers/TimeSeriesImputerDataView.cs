@@ -4,7 +4,10 @@
 
 using System;
 using System.Collections.Generic;
+<<<<<<< HEAD
 using System.IO;
+=======
+>>>>>>> origin/AutoMLTransformers
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -25,6 +28,7 @@ namespace Microsoft.ML.Transforms
         private TimeSeriesImputerTransformer _parent;
         public class SharedColumnState
         {
+<<<<<<< HEAD
             public SharedColumnState()
             {
                 SourceCanMoveNext = true;
@@ -42,6 +46,12 @@ namespace Microsoft.ML.Transforms
             // Hold the serialized data that we are going to send to the native code for processing.
             public MemoryStream MemStream { get; set; }
             public BinaryWriter BinWriter { get; set; }
+=======
+            public bool SourceCanMoveNext { get; set; }
+            public int TransformedDataPosition { get; set; }
+            public NativeBinaryArchiveData[] TransformedData { get; set; }
+            public byte[] ColumnBuffer { get; set; }
+>>>>>>> origin/AutoMLTransformers
             public TransformedDataSafeHandle TransformedDataHandler { get; set; }
         }
 
@@ -63,7 +73,11 @@ namespace Microsoft.ML.Transforms
                 string[] grainColumns, string[] dataColumns, string[] allColumnNames, Dictionary<string, TypedColumn> allColumns);
 
             internal abstract TypeId GetTypeId();
+<<<<<<< HEAD
             internal abstract void SerializeValue(BinaryWriter binaryWriter);
+=======
+            internal abstract byte[] GetSerializedValue();
+>>>>>>> origin/AutoMLTransformers
             internal abstract unsafe int GetDataSizeInBytes(byte* data, int currentOffset);
             internal abstract void QueueNonImputedColumnValue();
 
@@ -112,8 +126,11 @@ namespace Microsoft.ML.Transforms
                     return new StringTypedColumn(column, optionalColumns.Contains(column.Name), allImputedColumns.Contains(column.Name), state);
                 else if (type == typeof(bool).ToString())
                     return new BoolTypedColumn(column, optionalColumns.Contains(column.Name), allImputedColumns.Contains(column.Name), state);
+<<<<<<< HEAD
                 else if (type == typeof(DateTime).ToString())
                     return new DateTimeTypedColumn(column, optionalColumns.Contains(column.Name), allImputedColumns.Contains(column.Name), state);
+=======
+>>>>>>> origin/AutoMLTransformers
 
                 throw new InvalidOperationException($"Unsupported type {type}");
             }
@@ -159,6 +176,7 @@ namespace Microsoft.ML.Transforms
 
                         var outputDataSize = IntPtr.Zero;
                         NativeBinaryArchiveData* outputData = default;
+<<<<<<< HEAD
                         while (outputDataSize == IntPtr.Zero && SharedState.SourceCanMoveNext)
                         {
                             BuildColumnByteArray(allColumns, allImputedColumnNames);
@@ -166,6 +184,15 @@ namespace Microsoft.ML.Transforms
                             fixed (byte* bufferPointer = SharedState.MemStream.GetBuffer())
                             {
                                 var binaryArchiveData = new NativeBinaryArchiveData() { Data = bufferPointer, DataSize = new IntPtr(SharedState.MemStream.Position) };
+=======
+                        while(outputDataSize == IntPtr.Zero && SharedState.SourceCanMoveNext)
+                        {
+                            BuildColumnByteArray(allColumns, allImputedColumnNames, out int bufferLength);
+                            QueueDataForNonImputedColumns(allColumns, allImputedColumnNames);
+                            fixed (byte* bufferPointer = SharedState.ColumnBuffer)
+                            {
+                                var binaryArchiveData = new NativeBinaryArchiveData() { Data = bufferPointer, DataSize = new IntPtr(bufferLength) };
+>>>>>>> origin/AutoMLTransformers
                                 success = TransformDataNative(transformer, binaryArchiveData, out outputData, out outputDataSize, out errorHandle);
                                 if (!success)
                                     throw new Exception(GetErrorDetailsAndFreeNativeMemory(errorHandle));
@@ -173,8 +200,11 @@ namespace Microsoft.ML.Transforms
 
                             if (outputDataSize == IntPtr.Zero)
                                 SharedState.SourceCanMoveNext = cursor.MoveNext();
+<<<<<<< HEAD
 
                             SharedState.MemStream.Position = 0;
+=======
+>>>>>>> origin/AutoMLTransformers
                         }
 
                         if (!SharedState.SourceCanMoveNext)
@@ -195,18 +225,28 @@ namespace Microsoft.ML.Transforms
                         }
                     }
 
+<<<<<<< HEAD
                     // Base case where we didn't impute the column
                     if (!allImputedColumnNames.Contains(Column.Name))
                     {
                         var imputedData = SharedState.TransformedData[SharedState.TransformedDataPosition];
                         // If the row was imputed we want to just return the default value for the type.
+=======
+                    // Base case where we didn't impute anything
+                    if (!allImputedColumnNames.Contains(Column.Name))
+                    {
+                        var imputedData = SharedState.TransformedData[SharedState.TransformedDataPosition];
+>>>>>>> origin/AutoMLTransformers
                         if (BoolTypedColumn.GetBoolFromNativeBinaryArchiveData(imputedData.Data, 0))
                         {
                             dst = default;
                         }
                         else
                         {
+<<<<<<< HEAD
                             // If the row wasn't imputed, get the original value for that row we stored in the queue and return that.
+=======
+>>>>>>> origin/AutoMLTransformers
                             if (_position != cursor.Position)
                             {
                                 _position = cursor.Position;
@@ -215,7 +255,10 @@ namespace Microsoft.ML.Transforms
                             dst = _cache;
                         }
                     }
+<<<<<<< HEAD
                     // If we did impute the column then parse the data from the returned byte array.
+=======
+>>>>>>> origin/AutoMLTransformers
                     else
                     {
                         var imputedData = SharedState.TransformedData[SharedState.TransformedDataPosition];
@@ -249,11 +292,30 @@ namespace Microsoft.ML.Transforms
                 SourceQueue.Enqueue(GetSourceValue());
             }
 
+<<<<<<< HEAD
             private void BuildColumnByteArray(Dictionary<string, TypedColumn> allColumns, string[] columns)
             {
                 foreach (var column in columns.Where(x => x != IsRowImputedColumnName))
                 {
                     allColumns[column].SerializeValue(SharedState.BinWriter);
+=======
+            private void BuildColumnByteArray(Dictionary<string, TypedColumn> allColumns, string[] columns, out int bufferLength)
+            {
+                bufferLength = 0;
+                foreach(var column in columns.Where(x => x != IsRowImputedColumnName))
+                {
+                    var bytes = allColumns[column].GetSerializedValue();
+                    var byteLength = bytes.Length;
+                    if (byteLength + bufferLength >= SharedState.ColumnBuffer.Length)
+                    {
+                        var buffer = SharedState.ColumnBuffer;
+                        Array.Resize(ref buffer, SharedState.ColumnBuffer.Length * 2);
+                        SharedState.ColumnBuffer = buffer;
+                    }
+
+                    Array.Copy(bytes, 0, SharedState.ColumnBuffer, bufferLength, byteLength);
+                    bufferLength += byteLength;
+>>>>>>> origin/AutoMLTransformers
                 }
             }
 
@@ -282,6 +344,7 @@ namespace Microsoft.ML.Transforms
                 IsNullable = isNullable;
             }
 
+<<<<<<< HEAD
             internal override void SerializeValue(BinaryWriter binaryWriter)
             {
                 dynamic value = GetSourceValue();
@@ -290,6 +353,23 @@ namespace Microsoft.ML.Transforms
                     binaryWriter.Write(true);
 
                 binaryWriter.Write(value);
+=======
+            internal override byte[] GetSerializedValue()
+            {
+                dynamic value = GetSourceValue();
+                byte[] bytes;
+                if (value.GetType() == typeof(byte))
+                    bytes = new byte[1] { value };
+                if (BitConverter.IsLittleEndian)
+                    bytes = BitConverter.GetBytes(value);
+                else
+                    bytes = BitConverter.GetBytes(value);
+
+                if (IsNullable && value.GetType() != typeof(float) && value.GetType() != typeof(double))
+                    return new byte[1] { Convert.ToByte(true) }.Concat(bytes).ToArray();
+                else
+                    return bytes;
+>>>>>>> origin/AutoMLTransformers
             }
 
             internal override unsafe int GetDataSizeInBytes(byte* data, int currentOffset)
@@ -539,6 +619,7 @@ namespace Microsoft.ML.Transforms
                 _isNullable = isNullable;
             }
 
+<<<<<<< HEAD
             internal override void SerializeValue(BinaryWriter binaryWriter)
             {
                 var value = GetSourceValue().ToString();
@@ -550,6 +631,15 @@ namespace Microsoft.ML.Transforms
                 binaryWriter.Write(stringBytes.Length);
 
                 binaryWriter.Write(stringBytes);
+=======
+            internal override byte[] GetSerializedValue()
+            {
+                var value = GetSourceValue().ToString();
+                var stringBytes = Encoding.UTF8.GetBytes(value);
+                if (_isNullable)
+                    return new byte[] { Convert.ToByte(true)}.Concat(BitConverter.GetBytes(stringBytes.Length)).Concat(stringBytes).ToArray();
+                return BitConverter.GetBytes(stringBytes.Length).Concat(stringBytes).ToArray();
+>>>>>>> origin/AutoMLTransformers
             }
 
             internal unsafe override ReadOnlyMemory<char> GetDataFromNativeBinaryArchiveData(byte* data, int offset)
@@ -585,6 +675,7 @@ namespace Microsoft.ML.Transforms
             }
         }
 
+<<<<<<< HEAD
         private class DateTimeTypedColumn : TypedColumn<DateTime>
         {
             private static readonly DateTime _unixEpoch = new DateTime(1970, 1, 1);
@@ -637,6 +728,8 @@ namespace Microsoft.ML.Transforms
             }
         }
 
+=======
+>>>>>>> origin/AutoMLTransformers
         #endregion
 
         #region Native Exports
@@ -665,7 +758,11 @@ namespace Microsoft.ML.Transforms
 
             protected override bool ReleaseHandle()
             {
+<<<<<<< HEAD
                 // Not sure what to do with error stuff here.  There shouldn't ever be one though.
+=======
+                // Not sure what to do with error stuff here.  There shoudln't ever be one though.
+>>>>>>> origin/AutoMLTransformers
                 return DestroyTransformedDataNative(handle, _size, out IntPtr errorHandle);
             }
         }
@@ -718,7 +815,11 @@ namespace Microsoft.ML.Transforms
              new DataViewRowCursor[] { GetRowCursor(columnsNeeded, rand) };
 
         // Since we may add rows we don't know the row count
+<<<<<<< HEAD
         public long? GetRowCount() => null;
+=======
+        public long? GetRowCount() { return null; }
+>>>>>>> origin/AutoMLTransformers
 
         public void Save(ModelSaveContext ctx)
         {
@@ -747,7 +848,15 @@ namespace Microsoft.ML.Transforms
                 _schema = schema;
                 _transformer = transformer;
 
+<<<<<<< HEAD
                 var sharedState = new SharedColumnState();
+=======
+                var sharedState = new SharedColumnState()
+                {
+                    SourceCanMoveNext = true,
+                    ColumnBuffer = new byte[1024]
+                };
+>>>>>>> origin/AutoMLTransformers
 
                 _allColumns = _schema.Select(x => TypedColumn.CreateTypedColumn(x, dataColumns, allImputedColumnNames, sharedState)).ToDictionary(x => x.Column.Name); ;
                 _allColumns[IsRowImputedColumnName] = new BoolTypedColumn(_schema[IsRowImputedColumnName], false, true, sharedState);
@@ -773,7 +882,14 @@ namespace Microsoft.ML.Transforms
             /// <summary>
             /// Since rows will be generated all columns are active
             /// </summary>
+<<<<<<< HEAD
             public override bool IsColumnActive(DataViewSchema.Column column) => true;
+=======
+            public override bool IsColumnActive(DataViewSchema.Column column)
+            {
+                return true;
+            }
+>>>>>>> origin/AutoMLTransformers
 
             protected override void Dispose(bool disposing)
             {
@@ -792,11 +908,17 @@ namespace Microsoft.ML.Transforms
             {
                 _ch.Check(IsColumnActive(column));
 
+<<<<<<< HEAD
                 var originFn = _allColumns[column.Name].GetGetter();
                 var fn = originFn as ValueGetter<TValue>;
                 if (fn == null)
                     throw _ch.Except($"Invalid TValue in GetGetter: '{typeof(TValue)}', " +
                             $"expected type: '{originFn.GetType().GetGenericArguments().First()}'.");
+=======
+                var fn = _allColumns[column.Name].GetGetter() as ValueGetter<TValue>;
+                if (fn == null)
+                    throw _ch.Except("Invalid TValue in GetGetter: '{0}'", typeof(TValue));
+>>>>>>> origin/AutoMLTransformers
                 return fn;
             }
 

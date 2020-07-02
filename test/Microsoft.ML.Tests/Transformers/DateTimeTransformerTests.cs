@@ -8,7 +8,10 @@ using Microsoft.ML.Featurizers;
 using System;
 using Xunit;
 using Xunit.Abstractions;
+<<<<<<< HEAD
 using Microsoft.ML.TestFramework.Attributes;
+=======
+>>>>>>> origin/AutoMLTransformers
 
 namespace Microsoft.ML.Tests.Transformers
 {
@@ -23,16 +26,28 @@ namespace Microsoft.ML.Tests.Transformers
             public long date;
         }
 
+<<<<<<< HEAD
         [NotCentOS7Fact]
         public void CorrectNumberOfColumnsAndSchema()
         {
             MLContext mlContext = new MLContext(1);
             var dataList = new[] { new DateTimeInput() { date = 0 } };
+=======
+        [Fact]
+        public void CorrectNumberOfColumnsAndSchema()
+        {
+            MLContext mlContext = new MLContext(1);
+            var dataList = new[] { new DateTimeInput() { date = 0} };
+>>>>>>> origin/AutoMLTransformers
             var data = mlContext.Data.LoadFromEnumerable(dataList);
 
             // Build the pipeline, fit, and transform it.
             var columnPrefix = "DTC_";
+<<<<<<< HEAD
             var pipeline = mlContext.Transforms.FeaturizeDateTime("date", columnPrefix);
+=======
+            var pipeline = mlContext.Transforms.DateTimeTransformer("date", columnPrefix);
+>>>>>>> origin/AutoMLTransformers
             var model = pipeline.Fit(data);
             var output = model.Transform(data);
             var schema = output.Schema;
@@ -90,6 +105,7 @@ namespace Microsoft.ML.Tests.Transformers
             Done();
         }
 
+<<<<<<< HEAD
         [NotCentOS7Fact]
         public void CanUseDateFromColumnLongType()
         {
@@ -128,11 +144,114 @@ namespace Microsoft.ML.Tests.Transformers
             Assert.Equal("Monday", row[19].Value.ToString());           // DayOfWeekLabel
             Assert.Equal("", row[20].Value.ToString());  // HolidayName
             Assert.Equal((byte)0, row[21].Value);                       // IsPaidTimeOff
+=======
+        [Fact]
+        public void DropOneColumn()
+        {
+            // TODO: This will fail until we figure out the C++ dll situation
+
+            MLContext mlContext = new MLContext(1);
+            var dataList = new[] { new DateTimeInput() { date = 0 } };
+            var data = mlContext.Data.LoadFromEnumerable(dataList);
+
+            // Build the pipeline, fit, and transform it.
+            var columnPrefix = "DTC_";
+            var pipeline = mlContext.Transforms.DateTimeTransformer("date", columnPrefix, DateTimeTransformerEstimator.ColumnsProduced.IsPaidTimeOff);
+            var model = pipeline.Fit(data);
+            var output = model.Transform(data);
+            var schema = output.Schema;
+
+            // Check the schema has 21 columns
+            Assert.Equal(21, schema.Count);
+
+            // Make sure names with prefix and order are correct
+            Assert.Equal($"{columnPrefix}Year", schema[1].Name);
+            Assert.Equal($"{columnPrefix}Month", schema[2].Name);
+            Assert.Equal($"{columnPrefix}Day", schema[3].Name);
+            Assert.Equal($"{columnPrefix}Hour", schema[4].Name);
+            Assert.Equal($"{columnPrefix}Minute", schema[5].Name);
+            Assert.Equal($"{columnPrefix}Second", schema[6].Name);
+            Assert.Equal($"{columnPrefix}AmPm", schema[7].Name);
+            Assert.Equal($"{columnPrefix}Hour12", schema[8].Name);
+            Assert.Equal($"{columnPrefix}DayOfWeek", schema[9].Name);
+            Assert.Equal($"{columnPrefix}DayOfQuarter", schema[10].Name);
+            Assert.Equal($"{columnPrefix}DayOfYear", schema[11].Name);
+            Assert.Equal($"{columnPrefix}WeekOfMonth", schema[12].Name);
+            Assert.Equal($"{columnPrefix}QuarterOfYear", schema[13].Name);
+            Assert.Equal($"{columnPrefix}HalfOfYear", schema[14].Name);
+            Assert.Equal($"{columnPrefix}WeekIso", schema[15].Name);
+            Assert.Equal($"{columnPrefix}YearIso", schema[16].Name);
+            Assert.Equal($"{columnPrefix}MonthLabel", schema[17].Name);
+            Assert.Equal($"{columnPrefix}AmPmLabel", schema[18].Name);
+            Assert.Equal($"{columnPrefix}DayOfWeekLabel", schema[19].Name);
+            Assert.Equal($"{columnPrefix}HolidayName", schema[20].Name);
 
             TestEstimatorCore(pipeline, data);
             Done();
         }
 
+        [Fact]
+        public void DropManyColumns()
+        {
+            MLContext mlContext = new MLContext(1);
+            var dataList = new[] { new DateTimeInput() { date = 0 } };
+            var data = mlContext.Data.LoadFromEnumerable(dataList);
+
+            // Build the pipeline, fit, and transform it.
+            var columnPrefix = "DTC_";
+            var pipeline = mlContext.Transforms.DateTimeTransformer("date", columnPrefix, DateTimeTransformerEstimator.ColumnsProduced.IsPaidTimeOff,
+                DateTimeTransformerEstimator.ColumnsProduced.Day, DateTimeTransformerEstimator.ColumnsProduced.QuarterOfYear, DateTimeTransformerEstimator.ColumnsProduced.AmPm);
+            var model = pipeline.Fit(data);
+            var output = model.Transform(data);
+            var schema = output.Schema;
+
+            // Check the schema has 18 columns
+            Assert.Equal(18, schema.Count);
+
+            // Make sure names with prefix and order are correct
+            Assert.Equal($"{columnPrefix}Year", schema[1].Name);
+            Assert.Equal($"{columnPrefix}Month", schema[2].Name);
+            Assert.Equal($"{columnPrefix}Hour", schema[3].Name);
+            Assert.Equal($"{columnPrefix}Minute", schema[4].Name);
+            Assert.Equal($"{columnPrefix}Second", schema[5].Name);
+            Assert.Equal($"{columnPrefix}Hour12", schema[6].Name);
+            Assert.Equal($"{columnPrefix}DayOfWeek", schema[7].Name);
+            Assert.Equal($"{columnPrefix}DayOfQuarter", schema[8].Name);
+            Assert.Equal($"{columnPrefix}DayOfYear", schema[9].Name);
+            Assert.Equal($"{columnPrefix}WeekOfMonth", schema[10].Name);
+            Assert.Equal($"{columnPrefix}HalfOfYear", schema[11].Name);
+            Assert.Equal($"{columnPrefix}WeekIso", schema[12].Name);
+            Assert.Equal($"{columnPrefix}YearIso", schema[13].Name);
+            Assert.Equal($"{columnPrefix}MonthLabel", schema[14].Name);
+            Assert.Equal($"{columnPrefix}AmPmLabel", schema[15].Name);
+            Assert.Equal($"{columnPrefix}DayOfWeekLabel", schema[16].Name);
+            Assert.Equal($"{columnPrefix}HolidayName", schema[17].Name);
+
+            // Make sure types are correct
+            Assert.Equal(typeof(int), schema[1].Type.RawType);
+            Assert.Equal(typeof(byte), schema[2].Type.RawType);
+            Assert.Equal(typeof(byte), schema[3].Type.RawType);
+            Assert.Equal(typeof(byte), schema[4].Type.RawType);
+            Assert.Equal(typeof(byte), schema[5].Type.RawType);
+            Assert.Equal(typeof(byte), schema[6].Type.RawType);
+            Assert.Equal(typeof(byte), schema[7].Type.RawType);
+            Assert.Equal(typeof(byte), schema[8].Type.RawType);
+            Assert.Equal(typeof(ushort), schema[9].Type.RawType);
+            Assert.Equal(typeof(ushort), schema[10].Type.RawType);
+            Assert.Equal(typeof(byte), schema[11].Type.RawType);
+            Assert.Equal(typeof(byte), schema[12].Type.RawType);
+            Assert.Equal(typeof(int), schema[13].Type.RawType);
+            Assert.Equal(typeof(ReadOnlyMemory<char>), schema[14].Type.RawType);
+            Assert.Equal(typeof(ReadOnlyMemory<char>), schema[15].Type.RawType);
+            Assert.Equal(typeof(ReadOnlyMemory<char>), schema[16].Type.RawType);
+            Assert.Equal(typeof(ReadOnlyMemory<char>), schema[17].Type.RawType);
+>>>>>>> origin/AutoMLTransformers
+
+            TestEstimatorCore(pipeline, data);
+            Done();
+        }
+
+<<<<<<< HEAD
         [NotCentOS7Fact]
         public void CanUseDateFromColumnDateTimeType()
         {
@@ -143,6 +262,18 @@ namespace Microsoft.ML.Tests.Transformers
 
             // Build the pipeline, fit, and transform it.
             var pipeline = mlContext.Transforms.FeaturizeDateTime("date", "DTC");
+=======
+        [Fact]
+        public void CanUseDateFromColumn()
+        {
+            // Future Date - 2025 June 30
+            MLContext mlContext = new MLContext(1);
+            var dataList = new[] { new DateTimeInput() { date = 1751241600 } };
+            var data = mlContext.Data.LoadFromEnumerable(dataList);
+
+            // Build the pipeline, fit, and transform it.
+            var pipeline = mlContext.Transforms.DateTimeTransformer("date", "DTC");
+>>>>>>> origin/AutoMLTransformers
             var model = pipeline.Fit(data);
             var output = model.Transform(data);
 
@@ -175,17 +306,29 @@ namespace Microsoft.ML.Tests.Transformers
             TestEstimatorCore(pipeline, data);
             Done();
         }
+<<<<<<< HEAD
 
         [NotCentOS7Fact]
         public void HolidayTest()
         {
             // Date - 2025 June 30
+=======
+        
+        [Fact]
+        public void HolidayTest()
+        {
+            // Future Date - 2025 June 30
+>>>>>>> origin/AutoMLTransformers
             MLContext mlContext = new MLContext(1);
             var dataList = new[] { new DateTimeInput() { date = 157161600 } };
             var data = mlContext.Data.LoadFromEnumerable(dataList);
 
             // Build the pipeline, fit, and transform it.
+<<<<<<< HEAD
             var pipeline = mlContext.Transforms.FeaturizeDateTime("date", "DTC", country: DateTimeEstimator.HolidayList.Canada);
+=======
+            var pipeline = mlContext.Transforms.DateTimeTransformer("date", "DTC", country: DateTimeTransformerEstimator.Countries.Canada);
+>>>>>>> origin/AutoMLTransformers
             var model = pipeline.Fit(data);
             var output = model.Transform(data);
 
@@ -199,6 +342,7 @@ namespace Microsoft.ML.Tests.Transformers
             TestEstimatorCore(pipeline, data);
             Done();
         }
+<<<<<<< HEAD
 
         [NotCentOS7Fact]
         public void ManyRowsTestLongType()
@@ -255,11 +399,27 @@ namespace Microsoft.ML.Tests.Transformers
             var dataList = new[] { new { date = new DateTime(2025, 6, 30) }, new { date = new DateTime(2025, 6, 30) },
                 new { date = DateTime.Now }, new { date = DateTime.UtcNow },
                 new { date = DateTime.Now }, new { date = DateTime.UtcNow } };
+=======
+        
+        [Fact]
+        public void ManyRowsTest()
+        {
+            // Future Date - 2025 June 30
+            MLContext mlContext = new MLContext(1);
+            var dataList = new[] { new DateTimeInput() { date = 1751241600 }, new DateTimeInput() { date = 1751241600 }, new DateTimeInput() { date = 12341 },
+                new DateTimeInput() { date = 134 }, new DateTimeInput() { date = 134 }, new DateTimeInput() { date = 1234 }, new DateTimeInput() { date = 1751241600 },
+                new DateTimeInput() { date = 1751241600 }, new DateTimeInput() { date = 12341 },
+                new DateTimeInput() { date = 134 }, new DateTimeInput() { date = 134 }, new DateTimeInput() { date = 1234 }};
+>>>>>>> origin/AutoMLTransformers
 
             var data = mlContext.Data.LoadFromEnumerable(dataList);
 
             // Build the pipeline, fit, and transform it.
+<<<<<<< HEAD
             var pipeline = mlContext.Transforms.FeaturizeDateTime("date", "DTC");
+=======
+            var pipeline = mlContext.Transforms.DateTimeTransformer("date", "DTC");
+>>>>>>> origin/AutoMLTransformers
             var model = pipeline.Fit(data);
             var output = model.Transform(data);
 
@@ -292,18 +452,32 @@ namespace Microsoft.ML.Tests.Transformers
             TestEstimatorCore(pipeline, data);
             Done();
         }
+<<<<<<< HEAD
 
         [NotCentOS7Fact]
         public void EntryPointTest()
         {
             // Date - 2025 June 30
+=======
+        
+        [Fact]
+        public void EntryPointTest()
+        {
+            // Future Date - 2025 June 30
+>>>>>>> origin/AutoMLTransformers
             MLContext mlContext = new MLContext(1);
             var dataList = new[] { new DateTimeInput() { date = 1751241600 } };
             var data = mlContext.Data.LoadFromEnumerable(dataList);
 
             // Build the pipeline, fit, and transform it.
+<<<<<<< HEAD
             var options = new DateTimeEstimator.Options
             {
+=======
+            var options = new DateTimeTransformerEstimator.Options
+            {
+                ColumnsToDrop = null,
+>>>>>>> origin/AutoMLTransformers
                 Source = "date",
                 Prefix = "pref_",
                 Data = data
@@ -340,6 +514,7 @@ namespace Microsoft.ML.Tests.Transformers
 
             Done();
         }
+<<<<<<< HEAD
 
         [NotCentOS7Fact]
         public void LoadFromFileTest()
@@ -465,5 +640,7 @@ namespace Microsoft.ML.Tests.Transformers
 
             Done();
         }
+=======
+>>>>>>> origin/AutoMLTransformers
     }
 }

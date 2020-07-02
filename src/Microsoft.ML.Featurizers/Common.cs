@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+<<<<<<< HEAD
 using System.Diagnostics;
+=======
+>>>>>>> origin/AutoMLTransformers
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
@@ -8,6 +11,7 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Microsoft.ML.Featurizers
 {
+<<<<<<< HEAD
     // Training state of the native featurizers
     internal enum TrainingState
     {
@@ -62,13 +66,38 @@ namespace Microsoft.ML.Featurizers
         SparseTensor = 0x1001 | LastStaticValue + 2,
         Tabular = 0x1001 | LastStaticValue + 3,
 
+=======
+    #region Native Function Declarations
+
+    #endregion
+
+    internal enum FitResult : byte
+    {
+        Complete = 1, Continue, ResetAndContinue
+    }
+
+    // Not all these types are currently supported. This is so the ordering will allign with the native code.
+    internal enum TypeId : uint
+    {
+        String = 1, SByte, Short, Int, Long, Byte, UShort,
+        UInt, ULong, Float16, Float32, Double, Complex64,
+        Complex128, BFloat16, Bool, Timepoint, Duration,
+
+        LastStaticValue,
+        Tensor = 0x1001 | LastStaticValue + 1,
+        SparseTensor = 0x1001 | LastStaticValue + 2,
+        Tabular = 0x1001 | LastStaticValue + 3,
+>>>>>>> origin/AutoMLTransformers
         Nullable = 0x1001 | LastStaticValue + 4,
         Vector = 0x1001 | LastStaticValue + 5,
         MapId = 0x1002 | LastStaticValue + 6
     };
 
+<<<<<<< HEAD
     // Is a struct mirroring the native struct.
     // I used to pass binary data between ML.NET and the native code.
+=======
+>>>>>>> origin/AutoMLTransformers
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     internal unsafe struct NativeBinaryArchiveData
     {
@@ -78,7 +107,10 @@ namespace Microsoft.ML.Featurizers
 
     #region SafeHandles
 
+<<<<<<< HEAD
     // Safe handle that frees the memory for a native error returned to ML.NET.
+=======
+>>>>>>> origin/AutoMLTransformers
     internal class ErrorInfoSafeHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
         [DllImport("Featurizers", EntryPoint = "DestroyErrorInfo", CallingConvention = CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
@@ -95,6 +127,7 @@ namespace Microsoft.ML.Featurizers
         }
     }
 
+<<<<<<< HEAD
     // Safe handle that frees the memory for errors strings return from the native code to ML.NET.
     internal class ErrorInfoStringSafeHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
@@ -104,10 +137,23 @@ namespace Microsoft.ML.Featurizers
         public ErrorInfoStringSafeHandle(IntPtr handle) : base(true)
         {
             SetHandle(handle);
+=======
+    internal class ErrorInfoStringSafeHandle : SafeHandleZeroOrMinusOneIsInvalid
+    {
+        [DllImport("Featurizers", EntryPoint = "DestroyErrorInfoString", CallingConvention = CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+        private static extern bool DestroyErrorInfoString(IntPtr errorString, IntPtr errorStringSize);
+
+        private IntPtr _length;
+        public ErrorInfoStringSafeHandle(IntPtr handle, IntPtr length) : base(true)
+        {
+            SetHandle(handle);
+            _length = length;
+>>>>>>> origin/AutoMLTransformers
         }
 
         protected override bool ReleaseHandle()
         {
+<<<<<<< HEAD
             return DestroyErrorInfoString(handle);
         }
     }
@@ -122,12 +168,29 @@ namespace Microsoft.ML.Featurizers
         public TransformedDataSafeHandle(IntPtr handle, DestroyTransformedDataNative destroyCppTransformerEstimator) : base(true)
         {
             SetHandle(handle);
+=======
+            return DestroyErrorInfoString(handle, _length);
+        }
+    }
+
+    internal delegate bool DestroyTransformedDataNative(IntPtr output, IntPtr outputSize, out IntPtr errorHandle);
+    internal class TransformedDataSafeHandle : SafeHandleZeroOrMinusOneIsInvalid
+    {
+        private DestroyTransformedDataNative _destroySaveDataHandler;
+        private IntPtr _dataSize;
+
+        public TransformedDataSafeHandle(IntPtr handle, IntPtr dataSize, DestroyTransformedDataNative destroyCppTransformerEstimator) : base(true)
+        {
+            SetHandle(handle);
+            _dataSize = dataSize;
+>>>>>>> origin/AutoMLTransformers
             _destroySaveDataHandler = destroyCppTransformerEstimator;
         }
 
         protected override bool ReleaseHandle()
         {
             // Not sure what to do with error stuff here.  There shoudln't ever be one though.
+<<<<<<< HEAD
             return _destroySaveDataHandler(handle, out IntPtr errorHandle);
         }
     }
@@ -142,11 +205,26 @@ namespace Microsoft.ML.Featurizers
         {
             SetHandle(handle);
             _destroyNativeTransformerEstimator = destroyNativeTransformerEstimator;
+=======
+            return _destroySaveDataHandler(handle, _dataSize, out IntPtr errorHandle);
+        }
+    }
+
+    internal delegate bool DestroyCppTransformerEstimator(IntPtr estimator, out IntPtr errorHandle);
+    internal class TransformerEstimatorSafeHandle : SafeHandleZeroOrMinusOneIsInvalid
+    {
+        private DestroyCppTransformerEstimator _destroyCppTransformerEstimator;
+        public TransformerEstimatorSafeHandle(IntPtr handle, DestroyCppTransformerEstimator destroyCppTransformerEstimator) : base(true)
+        {
+            SetHandle(handle);
+            _destroyCppTransformerEstimator = destroyCppTransformerEstimator;
+>>>>>>> origin/AutoMLTransformers
         }
 
         protected override bool ReleaseHandle()
         {
             // Not sure what to do with error stuff here. There shouldn't ever be one though.
+<<<<<<< HEAD
             return _destroyNativeTransformerEstimator(handle, out IntPtr errorHandle);
         }
     }
@@ -154,10 +232,23 @@ namespace Microsoft.ML.Featurizers
     // Safe handle that frees the memory for the internal state of a native transformer.
     // Is called automatically after we save the model.
     internal delegate bool DestroyTransformerSaveData(IntPtr buffer, IntPtr bufferSize, out IntPtr errorHandle);
+=======
+            return _destroyCppTransformerEstimator(handle, out IntPtr errorHandle);
+        }
+    }
+
+    // Destroying saved data is always the same.
+    internal delegate bool DestroyTransformerSaveData(IntPtr buffer, IntPtr bufferSize, out IntPtr errorHandle);
+
+>>>>>>> origin/AutoMLTransformers
     internal class SaveDataSafeHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
         private readonly IntPtr _dataSize;
 
+<<<<<<< HEAD
+=======
+        // TODO: Update with correct entry point.
+>>>>>>> origin/AutoMLTransformers
         [DllImport("Featurizers", EntryPoint = "DestroyTransformerSaveData", CallingConvention = CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
         private static extern bool DestroyTransformerSaveDataNative(IntPtr buffer, IntPtr bufferSize, out IntPtr error);
 
@@ -176,16 +267,24 @@ namespace Microsoft.ML.Featurizers
 
     #endregion
 
+<<<<<<< HEAD
     // Static extension classes with Common methods used in multiple featurizers
     internal static class CommonExtensions
     {
         [DllImport("Featurizers", EntryPoint = "GetErrorInfoString", CallingConvention = CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
         private static extern bool GetErrorInfoString(IntPtr error, out IntPtr errorHandleString);
+=======
+    internal static class CommonExtensions
+    {
+        [DllImport("Featurizers", EntryPoint = "GetErrorInfoString", CallingConvention = CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+        private static extern bool GetErrorInfoString(IntPtr error, out IntPtr errorHandleString, out IntPtr errorHandleStringSize);
+>>>>>>> origin/AutoMLTransformers
 
         internal static string GetErrorDetailsAndFreeNativeMemory(IntPtr errorHandle)
         {
             using (var error = new ErrorInfoSafeHandle(errorHandle))
             {
+<<<<<<< HEAD
                 GetErrorInfoString(errorHandle, out IntPtr errorHandleString);
                 using (var errorString = new ErrorInfoStringSafeHandle(errorHandleString))
                 {
@@ -198,6 +297,22 @@ namespace Microsoft.ML.Featurizers
         {
             if (type == typeof(sbyte))
                 return TypeId.SByte;
+=======
+                GetErrorInfoString(errorHandle, out IntPtr errorHandleString, out IntPtr errorHandleStringSize);
+                using (var errorString = new ErrorInfoStringSafeHandle(errorHandleString, errorHandleStringSize))
+                {
+                    byte[] buffer = new byte[errorHandleStringSize.ToInt32()];
+                    Marshal.Copy(errorHandleString, buffer, 0, buffer.Length);
+
+                    return Encoding.UTF8.GetString(buffer);
+                }
+            }
+        }
+        internal static TypeId GetNativeTypeIdFromType(this Type type)
+        {
+            if (type == typeof(byte))
+                return TypeId.Byte;
+>>>>>>> origin/AutoMLTransformers
             else if (type == typeof(short))
                 return TypeId.Short;
             else if (type == typeof(int))
@@ -223,6 +338,7 @@ namespace Microsoft.ML.Featurizers
 
             throw new InvalidOperationException($"Unsupported type {type}");
         }
+<<<<<<< HEAD
 
         internal static bool OsIsCentOS7()
         {
@@ -270,5 +386,7 @@ namespace Microsoft.ML.Featurizers
                 return Encoding.UTF8.GetString((byte*)data.ToPointer(), length);
             }
         }
+=======
+>>>>>>> origin/AutoMLTransformers
     }
 }

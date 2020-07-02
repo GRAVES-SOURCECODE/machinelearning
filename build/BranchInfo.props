@@ -29,6 +29,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(IsStableProject)' == 'true'">
     <MajorVersion>1</MajorVersion>
+<<<<<<< HEAD
     <MinorVersion>5</MinorVersion>
     <PatchVersion>1</PatchVersion>
   </PropertyGroup>
@@ -36,5 +37,16 @@
     <MajorVersion>0</MajorVersion>
     <MinorVersion>17</MinorVersion>
     <PatchVersion>1</PatchVersion>
+=======
+    <MinorVersion>4</MinorVersion>
+    <PatchVersion>0</PatchVersion>
+    <PreReleaseLabel>preview2</PreReleaseLabel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(IsStableProject)' != 'true'">
+    <MajorVersion>0</MajorVersion>
+    <MinorVersion>16</MinorVersion>
+    <PatchVersion>0</PatchVersion>
+    <PreReleaseLabel>preview2</PreReleaseLabel>
+>>>>>>> origin/AutoMLTransformers
   </PropertyGroup>
 </Project>

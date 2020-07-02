@@ -1,14 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk" DefaultTargets="Pack">
 
   <PropertyGroup>
+<<<<<<< HEAD
     <TargetFrameworks>netstandard2.0;netcoreapp2.1</TargetFrameworks>
     <PackageDescription>ML.NET featurizers with native code implementation</PackageDescription>
+=======
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageDescription>ML.NET additional featurizers for AutoML</PackageDescription>
+>>>>>>> origin/AutoMLTransformers
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="../Microsoft.ML/Microsoft.ML.nupkgproj" />
 
+<<<<<<< HEAD
     <PackageReference Include="Microsoft.MLFeaturizers" Version="0.4.1" />
+=======
+    <PackageReference Include="MicrosoftMLFeaturizers" Version="0.1.0" />
+>>>>>>> origin/AutoMLTransformers
   </ItemGroup>
   
 </Project>
